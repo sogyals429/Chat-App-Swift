@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+import Firebase
 
 class RegisterViewController: UIViewController {
 
@@ -28,16 +28,32 @@ class RegisterViewController: UIViewController {
 
   
     @IBAction func registerPressed(_ sender: AnyObject) {
+        let email = emailTextfield.text!
+        let pass = passwordTextfield.text!
         
-
-        
-        //TODO: Set up a new user on our Firbase database
-        
-        
-
-        
-        
-    } 
+        if(validateDetails(email: email, password: pass)){
+            //TODO: Set up a new user on our Firbase database
+            Auth.auth().createUser(withEmail: email, password: pass) { (user, err) in
+                if err != nil{
+                    print(err!)
+                }else{
+                    //success
+                    print("Registration Success")
+                    self.performSegue(withIdentifier: "goToChat", sender: self)
+                }
+            }
+        }
+    }
     
-    
+    private func validateDetails(email:String,password:String) -> Bool{
+        let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+        
+        let emailPred = NSPredicate(format: "Self Matches %@", emailRegEx)
+        
+        let passRegex = "^(?=.*[a-z])(?=.*[$@$#!%*?&])[A-Za-z\\d$@$#!%*?&]{8,}"
+        let passPred = NSPredicate(format: "Self Matches %@", passRegex)
+        
+        return emailPred.evaluate(with: email) && passPred.evaluate(with: password)
+    }
+
 }
