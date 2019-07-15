@@ -27,7 +27,7 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     @IBOutlet var messageTextfield: UITextField!
     @IBOutlet var messageTableView: UITableView!
     
-    
+    @IBOutlet var profileBarBtn: UIBarButtonItem!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -53,7 +53,21 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
         messageTableView.separatorStyle = .none
         messageTableView.allowsSelection = false
         self.navigationItem.setHidesBackButton(true, animated: true)
+        
+//        profileBarBtn.setBackgroundImage(<#T##backgroundImage: UIImage?##UIImage?#>, for: <#T##UIControl.State#>, barMetrics: <#T##UIBarMetrics#>)
+//        profileBarBtn = UIBarButtonItem(image: UIImage(named: "user"), style: .plain, target: self, action: nil)
+        
     }
+    
+    ///////////////////////////////////////////
+    
+    //MARK: - Navigation Bar
+    @IBAction func profileBtnClicked(_ sender: UIBarButtonItem) {
+//        performSegue(withIdentifier: "goToProfile", sender: self)
+    }
+    
+    
+    
     
     ///////////////////////////////////////////
     
@@ -192,7 +206,7 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
-
+        
         let user = Auth.auth().currentUser?.providerData[0]
         
         if(user?.providerID != nil){

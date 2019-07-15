@@ -11,6 +11,7 @@ import GoogleSignIn
 import SVProgressHUD
 import os.log
 import ProgressHUD
+import Crashlytics
 
 class WelcomeViewController: UIViewController,GIDSignInDelegate,GIDSignInUIDelegate {
     
@@ -74,5 +75,5 @@ class WelcomeViewController: UIViewController,GIDSignInDelegate,GIDSignInUIDeleg
                                                  sourceApplication: sourceApplication,
                                                  annotation: annotation)
     }
-    
+
 }
