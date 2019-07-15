@@ -42,14 +42,13 @@ class WelcomeViewController: UIViewController,GIDSignInDelegate,GIDSignInUIDeleg
             SVProgressHUD.show()
             Auth.auth().signIn(with: cred) { (user, err) in
                 if err != nil{
-                    print("Error: \(err)")
+                    print("Error: \(err!)")
                     SVProgressHUD.dismiss()
                 }else{
                     let user = Auth.auth().currentUser!
                     os_log("Google Sign in Success:",log:self.log)
                     SVProgressHUD.dismiss()
                     ProgressHUD.showSuccess("Welcome \(user.displayName!)")
-                    self.printDetails(user:user)
                     self.performSegue(withIdentifier: "goToChat", sender: self)
                 }
             }
@@ -57,22 +56,17 @@ class WelcomeViewController: UIViewController,GIDSignInDelegate,GIDSignInUIDeleg
     }
     
     //Get User Details from Google
-    private func printDetails(user: User){
-        
-        if user != nil{
-            let uid = user.uid
-            let email = user.email
-            let fullName = user.displayName
-            
-            print("User ID: \(uid), Email: \(String(email!)), fullNAme = \(String(fullName!))")
-        }
-    }
-    
-    
-    func sign(_ signIn: GIDSignIn!, didDisconnectWith user: GIDGoogleUser!,
-              withError error: Error!) {
-        // Perform any operations when the user disconnects from app here.
-    }
+//    private func printDetails(user: User){
+//
+//        if user != nil{
+//            let uid = user.uid
+//            let email = user.email
+//            let fullName = user.displayName
+//
+//            print("User ID: \(uid), Email: \(String(email!)), fullNAme = \(String(fullName!))")
+//        }
+//    }
+
     
     func application(_ application: UIApplication,
                      open url: URL, sourceApplication: String?, annotation: Any) -> Bool {

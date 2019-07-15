@@ -198,7 +198,7 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
         if(user?.providerID != nil){
             Auth.auth().currentUser?.unlink(fromProvider: user!.providerID, completion: { (user, err) in
                 if err != nil{
-                    print(err)
+                    print(err!)
                 }else{
                     print("Account Unlinked")
                     ProgressHUD.showSuccess()
