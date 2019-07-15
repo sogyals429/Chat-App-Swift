@@ -8,10 +8,18 @@
 
 import UIKit
 import Firebase
+import ChameleonFramework
+import ProgressHUD
 
-class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSource {
+class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSource,UITextFieldDelegate {
     // Declare instance variables here
-
+    var messageArray : [Message] = [Message]()
+    lazy var refreshControl : UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        
+        refreshControl.addTarget(self, action: #selector(self.handleRefresh(_:)), for: UIControl.Event.valueChanged)
+        return refreshControl
+    }()
     
     // We've pre-linked the IBOutlets
     @IBOutlet var heightConstraint: NSLayoutConstraint!
@@ -29,18 +37,24 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
         messageTableView.dataSource = self
         
         //TODO: Set yourself as the delegate of the text field here:
+        messageTextfield.delegate = self
         
-        
-        
+        messageTableView.addSubview(self.refreshControl)
         //TODO: Set the tapGesture here:
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tableViewTapped))
         
+        messageTableView.addGestureRecognizer(tapGesture)
         
-
         //TODO: Register your MessageCell.xib file here:
         messageTableView.register(UINib(nibName: "MessageCell", bundle: nil), forCellReuseIdentifier: "customMessageCell")
         configureTableView()
+        retrieveMessages()
+        
+        messageTableView.separatorStyle = .none
+        messageTableView.allowsSelection = false
+        self.navigationItem.setHidesBackButton(true, animated: true)
     }
-
+    
     ///////////////////////////////////////////
     
     //MARK: - TableView DataSource Methods
@@ -50,9 +64,17 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     //TODO: Declare cellForRowAtIndexPath here:
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "customMessageCell", for: indexPath) as! CustomMessageCell
-        let messageArray = ["First Message","Second Message","Third Message"]
-        cell.senderUsername.text = "John"
-        cell.messageBody.text = messageArray[indexPath.row]
+        cell.messageBody.text = messageArray[indexPath.row].messageBody
+        cell.senderUsername.text = messageArray[indexPath.row].sender
+        cell.avatarImageView.image = UIImage(named: "egg")
+        
+        if cell.senderUsername.text == Auth.auth().currentUser?.email as String? {
+            cell.avatarImageView.backgroundColor = UIColor.flatMint()
+            cell.messageBackground.backgroundColor = UIColor.flatSkyBlue()
+        }else{
+            cell.avatarImageView.backgroundColor = UIColor.flatWatermelon()
+            cell.messageBackground.backgroundColor = UIColor.flatGray()
+        }
         return cell
     }
     
@@ -60,23 +82,21 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     
     //TODO: Declare numberOfRowsInSection here:
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return 3
-    }
-    
-    //TODO: Number of Sections
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 2
+        return messageArray.count
     }
     
     
     //TODO: Declare tableViewTapped here:
-    
+    @objc private func tableViewTapped(){
+        messageTextfield.endEditing(true)
+    }
     
     
     //TODO: Declare configureTableView here:
     func configureTableView(){
         messageTableView.rowHeight = UITableView.automaticDimension
         messageTableView.estimatedRowHeight = 120.0
+        
     }
     
     
@@ -85,16 +105,27 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     //MARK:- TextField Delegate Methods
     
     
-
+    
     
     //TODO: Declare textFieldDidBeginEditing here:
-    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.5) {
+            self.heightConstraint.constant = 308
+            self.view.layoutIfNeeded()
+        }
+        
+    }
     
     
     
     //TODO: Declare textFieldDidEndEditing here:
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        UIView.animate(withDuration: 0.5) {
+            self.heightConstraint.constant = 50
+            self.view.layoutIfNeeded()
+        }
+    }
     
-
     
     ///////////////////////////////////////////
     
@@ -107,29 +138,83 @@ class ChatViewController: UIViewController,UITableViewDelegate,UITableViewDataSo
     
     @IBAction func sendPressed(_ sender: AnyObject) {
         
-        
         //TODO: Send the message to Firebase and save it in our database
+        tableViewTapped()
+        messageTextfield.isEnabled = false
+        sendButton.isEnabled = false
         
+        let messagesDb = Database.database().reference().child("Messages")
         
+        let messageDictionary = ["Sender":Auth.auth().currentUser?.email, "Message Body":messageTextfield.text!]
+        
+        messagesDb.childByAutoId().setValue(messageDictionary){
+            (error,ref) in
+            if error != nil{
+                print(error!)
+            }else{
+                print("Message Sent")
+                self.messageTextfield.isEnabled = true
+                self.sendButton.isEnabled = true
+                self.messageTextfield.text = "" 
+            }
+        }
+        
+    }
+    
+    @objc func handleRefresh(_ refreshControl: UIRefreshControl) {
+        messageTableView.reloadData()
+        refreshControl.endRefreshing()
     }
     
     //TODO: Create the retrieveMessages method here:
     
+    func retrieveMessages(){
+        
+        let messageDB = Database.database().reference().child("Messages")
+        
+        messageDB.observe(.childAdded) { (snapshot) in
+            let snapshotValue = snapshot.value as! Dictionary<String,String>
+            let text = snapshotValue["Message Body"]!
+            let sender = snapshotValue["Sender"]!
+            
+            let message = Message()
+            message.messageBody = text
+            message.sender = sender
+            
+            self.messageArray.append(message)
+            self.configureTableView()
+            self.messageTableView.reloadData()
+        }
+        
+    }
     
-
     
     
     
     @IBAction func logOutPressed(_ sender: AnyObject) {
-        
-        //TODO: Log out the user and send them back to WelcomeViewController
-        do {
-            try Auth.auth().signOut()
-            navigationController?.popToRootViewController(animated: true)
-        } catch let err as NSError {
-            print("Error signing out: %@", err)
-        }
-        
-    }
 
+        let user = Auth.auth().currentUser?.providerData[0]
+        
+        if(user?.providerID != nil){
+            Auth.auth().currentUser?.unlink(fromProvider: user!.providerID, completion: { (user, err) in
+                if err != nil{
+                    print(err)
+                }else{
+                    print("Account Unlinked")
+                    ProgressHUD.showSuccess()
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            })
+        }else{
+            let auth = Auth.auth()
+            //TODO: Log out the user and send them back to WelcomeViewController
+            do {
+                try auth.signOut()
+                navigationController?.popToRootViewController(animated: true)
+            } catch let err as NSError {
+                print("Error signing out: %@", err)
+            }
+        }
+    }
+    
 }

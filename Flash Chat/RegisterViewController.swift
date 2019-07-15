@@ -9,10 +9,10 @@ import UIKit
 import Firebase
 
 class RegisterViewController: UIViewController {
-
+    
     
     //Pre-linked IBOutlets
-
+    
     @IBOutlet var emailTextfield: UITextField!
     @IBOutlet var passwordTextfield: UITextField!
     
@@ -20,13 +20,13 @@ class RegisterViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
     }
     
-
-  
+    
+    
     @IBAction func registerPressed(_ sender: AnyObject) {
         let email = emailTextfield.text!
         let pass = passwordTextfield.text!
@@ -55,5 +55,5 @@ class RegisterViewController: UIViewController {
         
         return emailPred.evaluate(with: email) && passPred.evaluate(with: password)
     }
-
+    
 }

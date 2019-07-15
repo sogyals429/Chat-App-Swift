@@ -12,4 +12,5 @@ target 'Flash Chat' do
     pod 'SVProgressHUD'
     pod 'ChameleonFramework'
     pod 'GoogleSignIn'
+    pod 'ProgressHUD'
 end
