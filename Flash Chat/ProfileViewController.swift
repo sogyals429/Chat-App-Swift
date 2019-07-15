@@ -8,6 +8,7 @@
 
 import UIKit
 import Firebase
+import GoogleMobileAds
 
 class ProfileViewController: UIViewController {
     
@@ -17,12 +18,17 @@ class ProfileViewController: UIViewController {
     @IBOutlet var emailTxtLabel: UILabel!
     @IBOutlet var pointsTxtLabel: UILabel!
     
+    @IBOutlet var bannerView: GADBannerView!
     let user = Auth.auth().currentUser!
     override func viewDidLoad() {
         super.viewDidLoad()
         updateUI()
-        
+        bannerView.adUnitID = "ca-app-pub-2972234919483485/7078595935"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
     }
+    
+    
     
     func updateUI(){
         if(user.displayName != nil || user.photoURL != nil){
@@ -41,8 +47,13 @@ class ProfileViewController: UIViewController {
         profileImage.layer.cornerRadius = profileImage.frame.height/2
         profileImage.clipsToBounds = true
     }
-
+    
 }
+
+
+/////////////////////
+//MARK:- Google Ads
+
 
 
 /////////////////////

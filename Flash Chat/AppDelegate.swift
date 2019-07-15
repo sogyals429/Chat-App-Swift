@@ -23,7 +23,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         //TODO: Initialise and Configure your Firebase here:
         FirebaseApp.configure()
         Crashlytics.sharedInstance().debugMode = true
-        
+        GADMobileAds.sharedInstance().start(completionHandler: nil)
         
         return true
     }

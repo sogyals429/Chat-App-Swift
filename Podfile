@@ -15,4 +15,6 @@ target 'Flash Chat' do
     pod 'ProgressHUD'
     pod 'Fabric', '~> 1.10.2'
     pod 'Crashlytics', '~> 3.13.4'
+    pod 'Firebase/Analytics'
+    pod 'Firebase/AdMob'
 end
