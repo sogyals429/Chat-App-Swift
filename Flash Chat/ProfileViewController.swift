@@ -19,13 +19,17 @@ class ProfileViewController: UIViewController {
     @IBOutlet var pointsTxtLabel: UILabel!
     
     @IBOutlet var bannerView: GADBannerView!
+    var interstitial: GADInterstitial!
+
+    
     let user = Auth.auth().currentUser!
     override func viewDidLoad() {
         super.viewDidLoad()
-        updateUI()
-        bannerView.adUnitID = "ca-app-pub-2972234919483485/7078595935"
+//        bannerView.adUnitID = "ca-app-pub-2972234919483485/7078595935"
+        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
+        updateUI()
     }
     
     
@@ -35,7 +39,7 @@ class ProfileViewController: UIViewController {
             self.navigationItem.title = (user.displayName!) + "'s profile"
             profileImage.dowloadFromServer(link: "\(user.photoURL!)", contentMode: .scaleAspectFill)
         }else{
-            self.navigationItem.title = user.displayName! + "'s profile"
+            self.navigationItem.title = user.email! + "'s profile"
             profileImage.dowloadFromServer(link: "https://image.flaticon.com/icons/png/512/97/97895.png")
         }
         
@@ -46,13 +50,17 @@ class ProfileViewController: UIViewController {
         profileImage.layer.masksToBounds = false
         profileImage.layer.cornerRadius = profileImage.frame.height/2
         profileImage.clipsToBounds = true
+        
+      
     }
+    
+    
+    /////////////////////
+    //MARK:- Google Ads
     
 }
 
 
-/////////////////////
-//MARK:- Google Ads
 
 
 

@@ -12,7 +12,7 @@ class CustomMessageCell: UITableViewCell {
 
 
     @IBOutlet var messageBackground: UIView!
-    @IBOutlet var avatarImageView: UIImageView!
+    @IBOutlet var avatarImageView: UIButton!
     @IBOutlet var messageBody: UILabel!
     @IBOutlet var senderUsername: UILabel!
     
@@ -24,5 +24,9 @@ class CustomMessageCell: UITableViewCell {
         
     }
 
-
+    @IBAction func profileBtnPressed(_ sender: UIButton) {
+        print("User Image Pressed")
+        print(senderUsername.text!)
+    }
+    
 }
